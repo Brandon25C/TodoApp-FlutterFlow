@@ -1,10 +1,12 @@
 import '/auth/firebase_auth/auth_util.dart';
+import '/backend/api_requests/api_calls.dart';
 import '/backend/backend.dart';
 import '/components/add_task_widget.dart';
 import '/components/task_widget.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'tasks_model.dart';
 export 'tasks_model.dart';
@@ -28,6 +30,27 @@ class _TasksWidgetState extends State<TasksWidget> {
   void initState() {
     super.initState();
     _model = createModel(context, () => TasksModel());
+
+    // On page load action.
+    SchedulerBinding.instance.addPostFrameCallback((_) async {
+      _model.apiResultayw = await ZenQuoteRandomCall.call();
+
+      if ((_model.apiResultayw?.succeeded ?? true)) {
+        _model.quoteText = getJsonField(
+          (_model.apiResultayw?.jsonBody ?? ''),
+          r'''$[0].q''',
+        ).toString();
+        _model.quoteAuthor = getJsonField(
+          (_model.apiResultayw?.jsonBody ?? ''),
+          r'''$[0].a''',
+        ).toString();
+        safeSetState(() {});
+      } else {
+        _model.quoteText = '\"Keep going. You\'re doing great.\"';
+        _model.quoteAuthor = 'Unknown';
+        safeSetState(() {});
+      }
+    });
 
     WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
   }
@@ -95,6 +118,88 @@ class _TasksWidgetState extends State<TasksWidget> {
             mainAxisSize: MainAxisSize.max,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              Align(
+                alignment: AlignmentDirectional(0.0, 0.0),
+                child: Container(
+                  width: double.infinity,
+                  height: 100.0,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    borderRadius: BorderRadius.circular(24.0),
+                    border: Border.all(
+                      color: FlutterFlowTheme.of(context).primary,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: Align(
+                    alignment: AlignmentDirectional(0.0, -1.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.max,
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Align(
+                          alignment: AlignmentDirectional(0.0, -1.0),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                0.0, 10.0, 0.0, 0.0),
+                            child: Text(
+                              _model.quoteText,
+                              textAlign: TextAlign.center,
+                              style: FlutterFlowTheme.of(context)
+                                  .bodySmall
+                                  .override(
+                                    font: GoogleFonts.inter(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .fontStyle,
+                                    ),
+                                    fontSize: 14.0,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .bodySmall
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .bodySmall
+                                        .fontStyle,
+                                  ),
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: EdgeInsetsDirectional.fromSTEB(
+                              0.0, 10.0, 0.0, 0.0),
+                          child: Text(
+                            _model.quoteAuthor,
+                            style:
+                                FlutterFlowTheme.of(context).bodySmall.override(
+                                      font: GoogleFonts.inter(
+                                        fontWeight: FlutterFlowTheme.of(context)
+                                            .bodySmall
+                                            .fontWeight,
+                                        fontStyle: FlutterFlowTheme.of(context)
+                                            .bodySmall
+                                            .fontStyle,
+                                      ),
+                                      fontSize: 14.0,
+                                      letterSpacing: 0.0,
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .bodySmall
+                                          .fontStyle,
+                                    ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
               Padding(
                 padding: EdgeInsetsDirectional.fromSTEB(24.0, 0.0, 0.0, 0.0),
                 child: Text(
